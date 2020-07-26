@@ -7,7 +7,10 @@ import config, sql, json
 app = Flask(__name__)
 app.secret_key = config.SKEY
 
-#region authorization and resources
+
+
+#region authorization and pre || after request
+
 
 @app.before_request
 def before_request():
@@ -18,13 +21,13 @@ def before_request():
     g.db = sql.connectDb()
 
 
-
 @app.after_request
 def after_request(response):
     if(hasattr(g, "db")):
         g.db.close()
 
     return response
+
 
 @app.route('/login', methods=["GET","POST"])
 def login():
@@ -46,16 +49,22 @@ def login():
 
     return "user musnt have space", 401
 
+
 @app.route('/logout', methods=["GET","POST"])
 def logout():
+
     if 'user' in session:
         session.pop('user')
 
     return "see you soon"
     
+
 #endregion
 
+
+
 #region web
+
 
 @app.route('/sendMsg/<string:toUsr>', methods=['POST'])
 def sendMsg(toUsr):
@@ -103,6 +112,7 @@ def getMultyMsg(fromUsr,visited):
     
     return mailPack 
 
+
 @app.route('/getOneMsg/<string:sign>', methods=['GET','POST'])
 def getOneMsg(sign):
 
@@ -133,13 +143,12 @@ def getOneMsg(sign):
         # returm the last message sent by the user
         msg = max(msgs,key=lambda m: dt.strptime(message(m[1:]).creation_date,config.DATE_FORMAT))
 
-    
-
     g.db.execute(sql.set_visited_one(msg[0]))
     g.db.commit()
 
     return {"msg": msg}, 200
-        
+
+
 @app.route('/delMsg/<int:id>',methods=['POST','DELETE'])
 def delMsg(id):
 
@@ -156,13 +165,18 @@ def delMsg(id):
 
     return "(: your message was deleted :)", 200
 
+
 #endregion
 
+
+
 #region errors
+
 
 @app.errorhandler(TypeError)
 def handle_type_error(error):
     return "bad parameters sent", 404
+
 
 @app.route('/clearDB', methods=["GET","POST"])
 def clearDB():
@@ -172,20 +186,24 @@ def clearDB():
 
     return "the DataBase is new now"
 
+
 #endregion
 
+
+
 #region classes and functions
+
 
 def checkUserExist(name):
     userId = g.db.execute(sql.check_user_exist(name)).fetchone()
     return bool(userId)
+
 
 def getUserId(name):
     sqlIdRows = g.db.execute(sql.get_user_id(name))
     for id in sqlIdRows:
         return id[0]
     
-
 
 class message:
     def __init__(self, arrParams):
@@ -202,7 +220,10 @@ class message:
                 "sbjct":self.sbjct,
                 "msg":self.msg}
 
+
 #endregion
+
+
 
 if __name__ == "__main__":
     app.debug = True
