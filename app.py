@@ -14,7 +14,7 @@ app.secret_key = config.SKEY
 
 @app.before_request
 def before_request():
-    if ((not request.endpoint == "login") and (not request.endpoint == "clearDB")):        
+    if (not request.endpoint in ["login", "clearDB", "Apear"] ):        
         if (not "user" in session):
             return "sprinklers on, you'r not logged in", 401
 
@@ -214,8 +214,8 @@ def clearDB():
 
 @app.route('/Apear/<user>', methods=["GET","POST"])
 def Apear(user):
-    
-    return g.db.db.execute("select last_transaction, logged_in from users where user_name = " + user).fetchone()
+
+    return g.db.db.execute("select last_transaction, logged_in from users where user_name = ?", (user,)).fetchone()[0]
 
 #endregion
 
