@@ -195,7 +195,7 @@ def delMsg(id):
 
 
 
-#region errors
+#region maintaining
 
 
 @app.errorhandler(TypeError)
@@ -211,6 +211,11 @@ def clearDB():
 
     return "the DataBase is new now"
 
+
+@app.route('/Apear/<user>', methods=["GET","POST"])
+def Apear(user):
+    
+    return g.db.db.execute("select last_transaction, logged_in from users where user_name = " + user).fetchone()
 
 #endregion
 
