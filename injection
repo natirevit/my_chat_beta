@@ -1,0 +1,105 @@
+!	33	Exclamation mark	0002
+"	34	Quotation mark	0003
+#	35	Number sign, Hashtag, Octothorpe, Sharp	0004
+$	36	Dollar sign	0005
+%	37	Percent sign	0006
+&	38	Ampersand	0007
+'	39	Apostrophe	0008
+(	40	Left parenthesis	0009
+)	41	Right parenthesis	0010
+*	42	Asterisk	0011
++	43	Plus sign	0012
+,	44	Comma	0013
+-	45	Hyphen-minus	0014
+.	46	Full stop	0015
+/	47	Slash (Solidus)	0016
+
+	0	48	Digit Zero	0017
+1	49	Digit One	0018
+2	50	Digit Two	0019
+3	51	Digit Three	0020
+4	52	Digit Four	0021
+5	53	Digit Five	0022
+6	54	Digit Six	0023
+7	55	Digit Seven	0024
+8	56	Digit Eight	0025
+9	57	Digit Nine	0026
+
+
+s	U+003A	:	58	Colon	0027
+;	59	Semicolon	0028
+<	60	Less-than sign	0029
+=	61	Equal sign	0030
+>	62	Greater-than sign	0031
+?	63	Question mark	0032
+@	64	At sign	0033
+
+:
+e	U+0041	A	65	Latin Capital letter A	0034
+B	66	Latin Capital letter B	0035
+C	67	Latin Capital letter C	0036
+D	68	Latin Capital letter D	0037
+E	69	Latin Capital letter E	0038
+F	70	Latin Capital letter F	0039
+G	71	Latin Capital letter G	0040
+H	72	Latin Capital letter H	0041
+I	73	Latin Capital letter I	0042
+J	74	Latin Capital letter J	0043
+K	75	Latin Capital letter K	0044
+L	76	Latin Capital letter L	0045
+M	77	Latin Capital letter M	0046
+N	78	Latin Capital letter N	0047
+O	79	Latin Capital letter O	0048
+P	80	Latin Capital letter P	0049
+Q	81	Latin Capital letter Q	0050
+R	82	Latin Capital letter R	0051
+S	83	Latin Capital letter S	0052
+T	84	Latin Capital letter T	0053
+U	85	Latin Capital letter U	0054
+V	86	Latin Capital letter V	0055
+W	87	Latin Capital letter W	0056
+X	88	Latin Capital letter X	0057
+Y	89	Latin Capital letter Y	0058
+Z	90	Latin Capital letter Z	0059
+
+
+s	U+005B	[	91	Left Square Bracket	0060
+\	92	Backslash	0061
+]	93	Right Square Bracket	0062
+^	94	Circumflex accent	0063
+_	95	Low line	0064
+`	96	Grave accent	0065
+
+:
+e	U+0061	a	97	Latin Small Letter A	0066
+b	98	Latin Small Letter B	0067
+c	99	Latin Small Letter C	0068
+d	100	Latin Small Letter D	0069
+e	101	Latin Small Letter E	0070
+f	102	Latin Small Letter F	0071
+g	103	Latin Small Letter G	0072
+h	104	Latin Small Letter H	0073
+i	105	Latin Small Letter I	0074
+j	106	Latin Small Letter J	0075
+k	107	Latin Small Letter K	0076
+l	108	Latin Small Letter L	0077
+m	109	Latin Small Letter M	0078
+n	110	Latin Small Letter N	0079
+o	111	Latin Small Letter O	0080
+p	112	Latin Small Letter P	0081
+q	113	Latin Small Letter Q	0082
+r	114	Latin Small Letter R	0083
+s	115	Latin Small Letter S	0084
+t	116	Latin Small Letter T	0085
+u	117	Latin Small Letter U	0086
+v	118	Latin Small Letter V	0087
+w	119	Latin Small Letter W	0088
+x	120	Latin Small Letter X	0089
+y	121	Latin Small Letter Y	0090
+z	122	Latin Small Letter Z	0091
+
+
+s	U+007B	{	123	Left Curly Bracket	0092
+|	124	Vertical bar	0093
+}	125	Right Curly Bracket	0094
+~	126	Tilde	0095

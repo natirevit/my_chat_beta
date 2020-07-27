@@ -1,7 +1,7 @@
 from flask import Flask, request, session, g
 import os, sqlite3, datetime
 from datetime import datetime as dt 
-import config, sql, json
+import config, sql, json 
 
 
 app = Flask(__name__)
@@ -18,7 +18,7 @@ def before_request():
         if (not "user" in session):
             return "sprinklers on, you'r not logged in", 401
 
-    g.db = sql.connectDb()
+    g.db = sql.sql(config.DB_NAME)
 
 
 @app.after_request
@@ -31,16 +31,21 @@ def after_request(response):
 
 @app.route('/login', methods=["GET","POST"])
 def login():
-
+    
     user = request.form['user'] 
     paswd = request.form['paswd']
+
+    #validation
+    valid = sql.validate()
+    if (not(valid.isStrInput(user) and valid.isStrIntInput(paswd))):
+        return "please enter valied input", 404
 
     if (not checkUserExist(user)):
         return "user " + user  + " unexist in the system", 404
     
     #simple sql injection check
     if (not ' ' in user):
-        dbPasswd = g.db.execute(sql.login(user)).fetchone()[0]
+        dbPasswd = g.db.login(user)
         if dbPasswd == paswd: 
             session['user'] = user
             return "you are in " + user, 200 
@@ -69,6 +74,16 @@ def logout():
 @app.route('/sendMsg/<string:toUsr>', methods=['POST'])
 def sendMsg(toUsr):
 
+    subject = request.form['subject'] 
+    content = request.form['content']
+
+    valid = sql.validate()
+    if (not (valid.isStrInput(toUsr) and
+             valid.isFullTxtInput(subject) and
+             valid.isFullTxtInput(content)
+            )):
+        return "please enter valied input", 404
+
     if (not checkUserExist(toUsr)):
         return "user " + toUsr  + " unexist in the system", 404
     elif (toUsr == session["user"]):
@@ -78,16 +93,21 @@ def sendMsg(toUsr):
                    dt.now().strftime(config.DATE_FORMAT),
                    request.form['subject'], request.form['content']))
 
-    g.db.execute(sql.insert_massage(msg))
-    g.db.commit()
+    g.db.insert_massage(msg)
 
-    msgId = g.db.execute(sql.get_sent_msg_id()).fetchone()[0]
+    msgId = g.db.get_sent_msg_id()
 
     return "sent successfuly - msg number is " + str(msgId), 200
 
 
 @app.route('/getMultyMsg/<string:fromUsr>/<int:visited>',methods=['GET','POST'])
 def getMultyMsg(fromUsr,visited):
+
+    valid = sql.validate()
+    if (not (valid.isStrInput(fromUsr) and
+             valid.isIntInput(visited) 
+            )):
+            return "please enter valied input", 404
 
     if (not checkUserExist(fromUsr)):
         return "user " + fromUsr  + " unexist in the system", 404
@@ -97,7 +117,7 @@ def getMultyMsg(fromUsr,visited):
     Sender = fromUsr
     Me = session['user']
 
-    msgs = g.db.execute(sql.get_all_msgs(Me, fromUsr, visited)).fetchall()
+    msgs = g.db.get_all_msgs(Me, fromUsr, visited)
 
     if (not msgs):
         return "there are no " + ( "" if visited else "new ") + "messages", 204
@@ -107,8 +127,7 @@ def getMultyMsg(fromUsr,visited):
         oMsg = message(msg[1:])
         mailPack['msgId ' + str(msg[0]) + ' content'] = oMsg.toDict()
 
-    g.db.execute(sql.set_visited_all(Me, Sender))
-    g.db.commit()
+    g.db.set_visited_all(Me, Sender)
     
     return mailPack 
 
@@ -116,11 +135,15 @@ def getMultyMsg(fromUsr,visited):
 @app.route('/getOneMsg/<string:sign>', methods=['GET','POST'])
 def getOneMsg(sign):
 
+    valid = sql.validate()
+    if (not valid.isStrIntInput(sign)):
+        return "please enter valied input", 404
+
     msg = None
 
     if (sign.isnumeric()):
 
-        msg = g.db.execute(sql.get_msg_by_id(sign)).fetchone()
+        msg = g.db.get_msg_by_id(sign)
         if (not msg ):
             return "no msg with this id"
 
@@ -135,7 +158,7 @@ def getOneMsg(sign):
         elif (sign == session["user"]):
             return "write a name of someone else", 404
         
-        msgs = g.db.execute(sql.get_all_msgs(session["user"],sign,True)).fetchall()
+        msgs = g.db.get_all_msgs(session["user"],sign,True)
 
         if ( not msgs ):
             return "no msg from " + sign, 204
@@ -143,8 +166,7 @@ def getOneMsg(sign):
         # returm the last message sent by the user
         msg = max(msgs,key=lambda m: dt.strptime(message(m[1:]).creation_date,config.DATE_FORMAT))
 
-    g.db.execute(sql.set_visited_one(msg[0]))
-    g.db.commit()
+    g.db.set_visited_one(msg[0])
 
     return {"msg": msg}, 200
 
@@ -152,16 +174,19 @@ def getOneMsg(sign):
 @app.route('/delMsg/<int:id>',methods=['POST','DELETE'])
 def delMsg(id):
 
-    msg = g.db.execute(sql.get_msg_by_id(id)).fetchone()
+    valid = sql.validate()
+    if (not valid.isIntInput(id)):
+            return "please enter valied input", 404
+
+    msg = g.db.get_msg_by_id(id)
     if (not msg):
-        return "msg not found"
+        return "msg not found", 204
 
     oMsg = message(msg[1:])
     if (oMsg.sender != session["user"] and oMsg.receiver != session["user"]):
             return "this isnt your message", 401
     
-    g.db.execute(sql.delete_message_by_id(id))
-    g.db.commit()
+    g.db.delete_message_by_id(id)
 
     return "(: your message was deleted :)", 200
 
@@ -181,8 +206,8 @@ def handle_type_error(error):
 @app.route('/clearDB', methods=["GET","POST"])
 def clearDB():
 
-    g.db.execute("DELETE FROM messages WHERE True = True")
-    g.db.commit()
+    g.db.db.execute("DELETE FROM messages WHERE True = True")
+    g.db.db.commit()
 
     return "the DataBase is new now"
 
@@ -195,14 +220,13 @@ def clearDB():
 
 
 def checkUserExist(name):
-    userId = g.db.execute(sql.check_user_exist(name)).fetchone()
+    userId = g.db.check_user_exist(name)
     return bool(userId)
 
 
 def getUserId(name):
-    sqlIdRows = g.db.execute(sql.get_user_id(name))
-    for id in sqlIdRows:
-        return id[0]
+    id = g.db.get_user_id(name)
+    return id 
     
 
 class message:
@@ -230,6 +254,7 @@ if __name__ == "__main__":
     host = os.environ.get('IP', config.IP)
     port = os.environ.get('PORT', config.PORT)
     app.run(host=host,port=port)
+
 
     
 
